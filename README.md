@@ -6,6 +6,49 @@ SAMPARK is an elderly care prototype that combines wearable-style health data, c
 
 SAMPARK integrates wearable data and conversational inputs to predict elderly health risks and provide real-time monitoring and alerts.
 
+## Quick Start (Unified System)
+
+### Installation
+
+1. Install all dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Run Everything Together
+
+Start all services with a single command:
+
+```bash
+python run_sampark.py
+```
+
+This will automatically start:
+- Flask Backend API (http://127.0.0.1:5000)
+- Streamlit Dashboard (http://localhost:8501)
+- Wearable Simulator (sending data every 10 seconds)
+
+**Options:**
+```bash
+# Run without wearable simulator
+python run_sampark.py --no-simulator
+
+# Use warning mode for simulator (generates risky health data)
+python run_sampark.py --simulator-mode warning
+
+# Change simulator data interval (in seconds)
+python run_sampark.py --simulator-interval 5
+```
+
+Press `Ctrl+C` to stop all services.
+
+### Access the System
+
+Once running:
+- **Dashboard**: Open http://localhost:8501 in your browser
+- **Backend API**: http://127.0.0.1:5000
+- **Voice Assistant**: Run separately (see below)
+
 ## System Architecture
 
 ```text
@@ -76,93 +119,105 @@ If some fields are missing, the backend fills default values. This is useful bec
 
 ## How To Run
 
-### 1. Start Backend
+### Option 1: Unified System (Recommended)
 
-```powershell
-cd "C:\Users\maham\Documents\Codex\2026-04-29\project-overview-sampark-ai-based-elderly\backend"
+Run all backend services together with one command:
+
+```bash
+python run_sampark.py
+```
+
+This starts:
+- Backend API (http://127.0.0.1:5000)
+- Dashboard (http://localhost:8501)
+- Wearable Simulator (auto-sending data)
+
+Press `Ctrl+C` to stop all services.
+
+---
+
+### Option 2: Manual (Run Services Separately)
+
+#### 1. Start Backend
+
+```bash
+cd backend
 python app.py
 ```
 
-Backend URL:
+Backend URL: http://127.0.0.1:5000
 
-```text
-http://127.0.0.1:5000
+#### 2. Start Dashboard
+
+**Streamlit Dashboard (Recommended):**
+```bash
+cd dashboard
+streamlit run app.py
 ```
 
-### 2. Open Dashboard
+Dashboard URL: http://localhost:8501
 
-Open this file in your browser:
+**Or Browser Dashboard:**
+Open `dashboard/index.html` in your browser.
 
-```text
-C:\Users\maham\Documents\Codex\2026-04-29\project-overview-sampark-ai-based-elderly\dashboard\index.html
-```
+#### 3. Run Text Assistant
 
-### 3. Run Text Assistant
-
-Open a second PowerShell:
-
-```powershell
-cd "C:\Users\maham\Documents\Codex\2026-04-29\project-overview-sampark-ai-based-elderly\voice_assistant"
+```bash
+cd voice_assistant
 python assistant.py
 ```
 
 Try:
-
 ```text
 I did not take medicine and slept only 4 hours
 ```
 
-### 4. Run Voice Assistant
+#### 4. Run Voice Assistant
 
-```powershell
-cd "C:\Users\maham\Documents\Codex\2026-04-29\project-overview-sampark-ai-based-elderly\voice_assistant"
+```bash
+cd voice_assistant
 python voice_mode.py
 ```
 
 Say:
-
 ```text
 I slept only 4 hours and I did not eat food
 ```
 
 Say `stop` to close.
 
-Optional human-like mode with Gemini:
+**Optional LLM Mode with Gemini:**
 
-```powershell
-$env:GEMINI_API_KEY="your_gemini_api_key_here"
-$env:SAMPARK_USE_LLM="1"
-$env:SAMPARK_LLM_PROVIDER="gemini"
+```bash
+export GEMINI_API_KEY="your_gemini_api_key_here"
+export SAMPARK_USE_LLM="1"
+export SAMPARK_LLM_PROVIDER="gemini"
 python voice_mode.py
 ```
 
-Optional human-like mode with OpenAI:
+**Optional LLM Mode with OpenAI:**
 
-```powershell
-$env:OPENAI_API_KEY="your_api_key_here"
-$env:SAMPARK_USE_LLM="1"
-$env:SAMPARK_LLM_PROVIDER="openai"
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+export SAMPARK_USE_LLM="1"
+export SAMPARK_LLM_PROVIDER="openai"
 python voice_mode.py
 ```
 
-### 5. Run Wearable Simulator
+#### 5. Run Wearable Simulator
 
-Open another PowerShell:
-
-```powershell
-cd "C:\Users\maham\Documents\Codex\2026-04-29\project-overview-sampark-ai-based-elderly\wearable_simulator"
+```bash
+cd wearable_simulator
 python simulator.py
 ```
 
-Risky watch data:
-
-```powershell
+**Risky watch data:**
+```bash
 python simulator.py --mode warning
 ```
 
-Live watch data:
-
-```powershell
+**Live watch data:**
+```bash
 python simulator.py --live
 ```
 
@@ -171,22 +226,19 @@ python simulator.py --live
 The backend uses a Random Forest Classifier trained on synthetic health data.
 
 Training file:
-
 ```text
 backend/train_model.py
 ```
 
 Generated files:
-
 ```text
 backend/synthetic_health_data.csv
 backend/sampark_model.pkl
 ```
 
 To retrain:
-
-```powershell
-cd "C:\Users\maham\Documents\Codex\2026-04-29\project-overview-sampark-ai-based-elderly\backend"
+```bash
+cd backend
 python train_model.py
 ```
 

@@ -1,0 +1,21 @@
+# SAMPARK - Unified Requirements
+# All dependencies for backend, dashboard, voice assistant, and wearable simulator
+
+# Flask Backend
+Flask==3.0.3
+flask-cors==4.0.1
+scikit-learn==1.5.1
+
+# Dashboard (Streamlit)
+streamlit==1.37.1
+pandas==2.2.2
+
+# Voice Assistant
+SpeechRecognition==3.10.4
+pyttsx3==2.90
+PyAudio==0.2.14
+
+# Shared Dependencies
+requests==2.32.3
+openai==1.93.0
+google-genai==1.49.0

@@ -2,3 +2,7 @@
 __pycache__/
 .env
 *.pyc
+.bob/
+*.db
+*.pkl
+venv/
