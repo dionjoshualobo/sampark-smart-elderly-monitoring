@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAMPARK Watch Simulator</title>
+  <style>
+    :root {
+      --bg: #f3f7fb;
+      --panel: #ffffff;
+      --text: #162033;
+      --muted: #65758b;
+      --line: #d7e2ee;
+      --primary: #1d5fd7;
+      --accent: #0d9488;
+      --low: #16834a;
+      --medium: #b86a00;
+      --high: #c7364a;
+      --navy: #10243e;
+      --screen: #0b1626;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Inter, Arial, sans-serif;
+      background: linear-gradient(180deg, #e8f1fb 0%, #f8fbfd 34%, #eef4f8 100%);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--navy);
+      color: #ffffff;
+    }
+
+    .topbar {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      font-weight: 800;
+      font-size: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: #c9d6e5;
+      font-size: 13px;
+    }
+
+    .status-pill {
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--medium);
+    }
+
+    .dot.online {
+      background: var(--low);
+    }
+
+    .dot.offline {
+      background: var(--high);
+    }
+
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: minmax(300px, 420px) 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    /* Watch hardware */
+    .watch-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .strap {
+      width: 130px;
+      height: 46px;
+      background: linear-gradient(180deg, #23364d, #17273a);
+      border-radius: 18px 18px 8px 8px;
+    }
+
+    .strap.bottom {
+      border-radius: 8px 8px 18px 18px;
+    }
+
+    .watch-body {
+      width: 280px;
+      padding: 16px;
+      margin: -6px 0;
+      background: linear-gradient(160deg, #33475f, #1d2f44);
+      border-radius: 52px;
+      box-shadow: 0 22px 45px rgba(16, 36, 62, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      position: relative;
+      z-index: 1;
+    }
+
+    .watch-screen {
+      background: radial-gradient(120% 120% at 20% 0%, #14243a 0%, var(--screen) 60%);
+      border: 3px solid #0a111c;
+      border-radius: 38px;
+      padding: 18px 16px 14px;
+      color: #eaf2fc;
+      text-align: center;
+    }
+
+    .watch-time {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .watch-date {
+      font-size: 11px;
+      color: #9db4cd;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 2px;
+    }
+
+    .hr-block {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .heart {
+      width: 34px;
+      height: 34px;
+      background: #ff4d6d;
+      clip-path: path("M17 30 C -10 12, 6 -6, 17 6 C 28 -6, 44 12, 17 30 Z");
+      animation: beat 1s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 77, 109, 0.7));
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.28); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.18); }
+      60% { transform: scale(1); }
+    }
+
+    .hr-value {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .hr-unit {
+      font-size: 11px;
+      color: #9db4cd;
+      letter-spacing: 1px;
+    }
+
+    .mini-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .mini {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 8px 4px;
+    }
+
+    .mini-value {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .mini-label {
+      font-size: 10px;
+      color: #9db4cd;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+
+    .watch-mode {
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #7ee2cf;
+    }
+
+    .watch-mode.warning {
+      color: #ffb454;
+    }
+
+    .battery {
+      position: absolute;
+      top: 26px;
+      right: 30px;
+      font-size: 10px;
+      color: #9db4cd;
+      z-index: 2;
+    }
+
+    /* Signal */
+    .signal-card {
+      margin-top: 18px;
+    }
+
+    canvas#ecg {
+      width: 100%;
+      height: 110px;
+      display: block;
+      background: #0b1626;
+      border-radius: 10px;
+      border: 1px solid #0a111c;
+    }
+
+    .signal-caption {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Right side panels */
+    .stack {
+      display: grid;
+      gap: 20px;
+    }
+
+    .mode-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-chip {
+      flex: 1;
+      min-width: 96px;
+      padding: 10px;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      background: #f8fafc;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 140ms ease;
+    }
+
+    .mode-chip.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #eef4ff;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    label.small {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    input[type="range"] {
+      flex: 1;
+    }
+
+    .switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      flex: none;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #cbd5e1;
+      cursor: pointer;
+      transition: 160ms;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: 160ms;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--primary);
+      border: 1px solid var(--line);
+    }
+
+    button.danger {
+      background: var(--high);
+      width: 100%;
+      margin-top: 14px;
+      font-size: 15px;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .field-inline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .field-inline input[type="number"] {
+      width: 90px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    /* Result + log */
+    .result-empty {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .result-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .risk-badge {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #ffffff;
+      background: var(--muted);
+    }
+
+    .risk-badge.Low {
+      background: var(--low);
+    }
+
+    .risk-badge.Medium {
+      background: var(--medium);
+    }
+
+    .risk-badge.High {
+      background: var(--high);
+    }
+
+    .alert-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .alert-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: #fff7ed;
+      color: var(--medium);
+    }
+
+    .alert-chip.High {
+      background: #fdecea;
+      color: var(--high);
+      border-color: #f5c6c0;
+    }
+
+    .reasons {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .log-list {
+      max-height: 260px;
+      overflow-y: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .log-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #f8fafc;
+    }
+
+    .log-item.error {
+      border-color: #f5c6c0;
+      background: #fdf1ef;
+      color: var(--high);
+    }
+
+    .log-risk {
+      font-weight: 800;
+    }
+
+    .log-risk.Low {
+      color: var(--low);
+    }
+
+    .log-risk.Medium {
+      color: var(--medium);
+    }
+
+    .log-risk.High {
+      color: var(--high);
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">S</div>
+        <div>
+          <h1>Watch Simulator</h1>
+          <p class="subtitle">Simulated smartwatch streaming vitals into SAMPARK</p>
+        </div>
+      </div>
+      <div class="status-pill">
+        <span class="dot" id="connDot"></span>
+        <span id="connText">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div>
+      <div class="watch-wrap">
+        <div class="strap"></div>
+        <div class="watch-body">
+          <span class="battery">🔋 84%</span>
+          <div class="watch-screen">
+            <div class="watch-time" id="clockTime">--:--</div>
+            <div class="watch-date" id="clockDate">—</div>
+            <div class="hr-block">
+              <div class="heart" id="heartIcon"></div>
+              <div>
+                <div class="hr-value" id="hrValue">--</div>
+                <div class="hr-unit">BPM · HEART RATE</div>
+              </div>
+            </div>
+            <div class="mini-grid">
+              <div class="mini">
+                <div class="mini-value" id="spo2Value">--%</div>
+                <div class="mini-label">SPO2</div>
+              </div>
+              <div class="mini">
+                <div class="mini-value" id="stepsValue">0</div>
+                <div class="mini-label">STEPS</div>
+              </div>
+              <div class="mini">
+                <div class="mini-value" id="sleepValue">-</div>
+                <div class="mini-label">HRS SLEEP</div>
+              </div>
+            </div>
+            <div class="watch-mode" id="modeLabel">NORMAL MODE</div>
+          </div>
+        </div>
+        <div class="strap bottom"></div>
+      </div>
+
+      <section class="panel signal-card">
+        <h2>Live Heart Signal</h2>
+        <canvas id="ecg" width="720" height="110"></canvas>
+        <div class="signal-caption">
+          <span>ECG-style trace (simulated)</span>
+          <span id="beatInfo">-- bpm</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="panel">
+        <h2>Simulation Controls</h2>
+        <div class="mode-row" id="modeRow">
+          <div class="mode-chip active" data-mode="random" onclick="setMode('random')">Random Mix</div>
+          <div class="mode-chip" data-mode="normal" onclick="setMode('normal')">Normal</div>
+          <div class="mode-chip" data-mode="warning" onclick="setMode('warning')">Warning</div>
+        </div>
+
+        <div class="control-row">
+          <label class="small">Auto-send</label>
+          <span style="font-size:13px;color:var(--muted)" id="intervalLabel">every 10s</span>
+          <input type="range" id="intervalRange" min="3" max="30" value="10">
+          <label class="switch">
+            <input type="checkbox" id="autoSend" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="field-inline">
+          <label class="small" for="sleepInput">Sleep last night</label>
+          <input type="number" id="sleepInput" min="0" max="14" step="0.5" placeholder="auto">
+          <button type="button" class="secondary" onclick="sendReading()">Send Now</button>
+        </div>
+
+        <button type="button" class="danger" onclick="sendFallAlert()">⚠ Fall Detected — Alert Caregiver</button>
+
+        <p class="hint">
+          The watch streams readings to the backend exactly like a real Mi Band / Google Fit
+          integration would. Warning mode generates risky vitals so you can see alerts fire on
+          the dashboard. Open <a href="/dashboard">the dashboard</a> in another tab to watch it live.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Last Backend Response</h2>
+        <div id="resultPanel">
+          <div class="result-empty">No reading sent yet.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Activity Log</h2>
+        <div class="log-list" id="logList"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const apiBase = (location.protocol === "http:" || location.protocol === "https:")
+      ? window.location.origin
+      : "http://127.0.0.1:5000";
+
+    const state = {
+      mode: "random",
+      hr: 78,
+      spo2: 98,
+      steps: 0,
+      restCycles: 0,
+      sleepHours: null,
+      sending: false,
+    };
+
+    let sendTimer = null;
+
+    // ---------- clock ----------
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clockTime").textContent =
+        `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      document.getElementById("clockDate").textContent =
+        now.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+    }
+    setInterval(updateClock, 1000);
+
+    // ---------- live vitals ----------
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function targetVitalsFor(mode) {
+      if (mode === "normal") {
+        return { hr: randInt(65, 95), spo2: randInt(96, 100), risky: false };
+      }
+      if (mode === "warning") {
+        return { hr: randInt(45, 54) , spo2: randInt(90, 94), risky: true };
+      }
+      const warning = Math.random() > 0.72;
+      if (warning) {
+        return { hr: Math.random() > 0.5 ? randInt(45, 54) : randInt(112, 125), spo2: randInt(90, 94), risky: true };
+      }
+      return { hr: randInt(65, 95), spo2: randInt(96, 100), risky: false };
+    }
+
+    function advanceSteps() {
+      if (state.restCycles > 0) {
+        state.restCycles -= 1;
+        return;
+      }
+      if (Math.random() < 0.28) {
+        state.restCycles = randInt(2, 8);
+        return;
+      }
+      state.steps += state.mode === "warning" ? randInt(0, 40) : randInt(20, 220);
+    }
+
+    function refreshWatchFace() {
+      advanceSteps();
+      const vitals = targetVitalsFor(state.mode);
+      // Smooth drift toward the new target so numbers feel alive
+      state.hr += Math.sign(vitals.hr - state.hr) * Math.min(Math.abs(vitals.hr - state.hr), randInt(1, 6));
+      state.spo2 += Math.sign(vitals.spo2 - state.spo2) * (Math.abs(vitals.spo2 - state.spo2) > 2 ? 2 : 1);
+      state.risky = vitals.risky;
+
+      document.getElementById("hrValue").textContent = Math.round(state.hr);
+      document.getElementById("spo2Value").textContent = `${Math.round(state.spo2)}%`;
+      document.getElementById("stepsValue").textContent = state.steps.toLocaleString("en-IN");
+      document.getElementById("sleepValue").textContent =
+        state.sleepHours !== null ? state.sleepHours : "-";
+
+      const heart = document.getElementById("heartIcon");
+      heart.style.animationDuration = `${(60 / Math.max(state.hr, 35)).toFixed(2)}s`;
+
+      const modeLabel = document.getElementById("modeLabel");
+      modeLabel.textContent = `${state.mode.toUpperCase()} MODE`;
+      modeLabel.classList.toggle("warning", state.mode === "warning");
+
+      document.getElementById("beatInfo").textContent = `${Math.round(state.hr)} bpm`;
+      ecgColor = state.risky ? "#ffb454" : "#37e0b8";
+    }
+    setInterval(refreshWatchFace, 1000);
+
+    // ---------- ECG canvas ----------
+    const ecgCanvas = document.getElementById("ecg");
+    const ecgCtx = ecgCanvas.getContext("2d");
+    const samples = new Array(ecgCanvas.width).fill(0);
+    let ecgPhase = 0;
+    let ecgColor = "#37e0b8";
+
+    function ecgWave(p) {
+      if (p < 0.08) return 0.12 * Math.sin((p / 0.08) * Math.PI);
+      if (p < 0.14) return -0.18 * Math.sin(((p - 0.08) / 0.06) * Math.PI);
+      if (p < 0.20) {
+        const q = (p - 0.14) / 0.06;
+        return q < 0.3 ? -0.25 * (q / 0.3) : 1.05 * Math.sin(((q - 0.3) / 0.7) * Math.PI);
+      }
+      if (p < 0.30) return -0.32 * Math.sin(((p - 0.20) / 0.10) * Math.PI);
+      if (p < 0.45) return 0.28 * Math.sin(((p - 0.30) / 0.15) * Math.PI);
+      return 0;
+    }
+
+    function drawEcg() {
+      const beatsPerFrame = (state.hr / 60) / 30;
+      ecgPhase = (ecgPhase + beatsPerFrame) % 1;
+
+      samples.shift();
+      samples.push(ecgWave(ecgPhase));
+
+      const { width, height } = ecgCanvas;
+      ecgCtx.fillStyle = "#0b1626";
+      ecgCtx.fillRect(0, 0, width, height);
+      ecgCtx.strokeStyle = "rgba(255,255,255,0.07)";
+      ecgCtx.beginPath();
+      for (let x = 0; x <= width; x += 36) {
+        ecgCtx.moveTo(x, 0);
+        ecgCtx.lineTo(x, height);
+      }
+      ecgCtx.stroke();
+
+      ecgCtx.strokeStyle = ecgColor;
+      ecgCtx.lineWidth = 2;
+      ecgCtx.shadowColor = ecgColor;
+      ecgCtx.shadowBlur = 6;
+      ecgCtx.beginPath();
+      samples.forEach((value, x) => {
+        const y = height * 0.62 - value * height * 0.45;
+        if (x === 0) ecgCtx.moveTo(x, y);
+        else ecgCtx.lineTo(x, y);
+      });
+      ecgCtx.stroke();
+      ecgCtx.shadowBlur = 0;
+
+      requestAnimationFrame(drawEcg);
+    }
+    requestAnimationFrame(drawEcg);
+
+    // ---------- controls ----------
+    function setMode(mode) {
+      state.mode = mode;
+      document.querySelectorAll(".mode-chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.mode === mode);
+      });
+      refreshWatchFace();
+    }
+
+    const intervalRange = document.getElementById("intervalRange");
+    intervalRange.addEventListener("input", () => {
+      document.getElementById("intervalLabel").textContent = `every ${intervalRange.value}s`;
+      scheduleAutoSend();
+    });
+
+    document.getElementById("autoSend").addEventListener("change", scheduleAutoSend);
+
+    function scheduleAutoSend() {
+      if (sendTimer) clearInterval(sendTimer);
+      const enabled = document.getElementById("autoSend").checked;
+      if (enabled) {
+        sendTimer = setInterval(sendReading, Number(intervalRange.value) * 1000);
+      }
+    }
+
+    // ---------- sending ----------
+    function buildPayload(fall = false) {
+      const payload = {
+        heart_rate: Math.round(state.hr),
+        spo2: Math.round(state.spo2),
+        steps: state.steps,
+        source: "watch_simulator",
+      };
+      const sleepInput = document.getElementById("sleepInput").value;
+      if (sleepInput !== "") {
+        state.sleepHours = Number(sleepInput);
+        payload.sleep_hours = state.sleepHours;
+      }
+      if (fall) {
+        payload.falls = 1;
+      }
+      return payload;
+    }
+
+    async function postReading(payload) {
+      const response = await fetch(`${apiBase}/health-data`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error(`Backend responded ${response.status}`);
+      }
+      return response.json();
+    }
+
+    function setConnection(online, text) {
+      document.getElementById("connDot").className = `dot ${online ? "online" : "offline"}`;
+      document.getElementById("connText").textContent = text;
+    }
+
+    function renderResult(record) {
+      const alerts = record.new_alerts || [];
+      const chips = alerts.length
+        ? `<div class="alert-chips">${alerts.map((a) =>
+            `<span class="alert-chip ${a.severity}">🔔 ${a.alert_type}</span>`).join("")}</div>`
+        : "";
+      const reasons = record.reasons && record.reasons.length
+        ? `<div class="reasons"><strong>Reasons:</strong> ${record.reasons.join(", ")}</div>`
+        : "";
+
+      document.getElementById("resultPanel").innerHTML = `
+        <div class="result-head">
+          <span class="risk-badge ${record.risk}">${record.risk} Risk</span>
+          <span style="font-size:13px;color:var(--muted)">Record #${record.id} · ${record.created_at}</span>
+        </div>
+        ${chips}
+        ${reasons}
+      `;
+    }
+
+    function addLog(text, risk = null, isError = false) {
+      const list = document.getElementById("logList");
+      const item = document.createElement("div");
+      item.className = `log-item${isError ? " error" : ""}`;
+      const time = new Date().toLocaleTimeString("en-IN", { hour12: false });
+      item.innerHTML = isError
+        ? `<span>${text}</span><span>${time}</span>`
+        : `<span>${text}</span><span class="log-risk ${risk}">${risk}</span>`;
+      list.prepend(item);
+      while (list.children.length > 30) {
+        list.lastChild.remove();
+      }
+    }
+
+    async function sendReading() {
+      if (state.sending) return;
+      state.sending = true;
+      const payload = buildPayload();
+      try {
+        const record = await postReading(payload);
+        renderResult(record);
+        addLog(
+          `HR ${record.heart_rate} · SpO2 ${record.spo2}% · ${record.steps} steps${payload.falls ? " · FALL" : ""}`,
+          record.risk,
+        );
+        setConnection(true, `Connected to ${apiBase}`);
+      } catch (error) {
+        addLog(`Send failed: ${error.message}`, null, true);
+        setConnection(false, "Backend unreachable");
+      } finally {
+        state.sending = false;
+      }
+    }
+
+    async function sendFallAlert() {
+      const payload = buildPayload(true);
+      try {
+        const record = await postReading(payload);
+        renderResult(record);
+        addLog("FALL DETECTED — caregiver alerted", record.risk);
+        setConnection(true, `Connected to ${apiBase}`);
+      } catch (error) {
+        addLog(`Fall alert failed: ${error.message}`, null, true);
+        setConnection(false, "Backend unreachable");
+      }
+    }
+
+    // ---------- init ----------
+    updateClock();
+    refreshWatchFace();
+    scheduleAutoSend();
+    fetch(`${apiBase}/`)
+      .then(() => setConnection(true, `Connected to ${apiBase}`))
+      .catch(() => setConnection(false, "Backend unreachable"));
+  </script>
+</body>
+</html>

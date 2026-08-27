@@ -76,6 +76,7 @@ def create_emergency_alert(message, source):
         "High",
         "Emergency",
         f"Emergency from {source}: {message}",
+        bypass_cooldown=True,
     )
 
     email_result = send_caretaker_email(

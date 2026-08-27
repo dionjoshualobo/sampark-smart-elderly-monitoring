@@ -1,7 +1,10 @@
-from flask import Flask, jsonify, request
+from pathlib import Path
+
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 
 from database import (
+    acknowledge_alert,
     create_alert,
     create_health_record,
     get_latest_alert,
@@ -17,8 +20,25 @@ from assistant_web import handle_assistant_message
 from risk_engine import predict_risk
 
 
+BASE_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = BASE_DIR.parent
+
 app = Flask(__name__)
 CORS(app)
+
+
+PAGES = {
+    "dashboard": PROJECT_DIR / "dashboard" / "index.html",
+    "watch": PROJECT_DIR / "wearable_simulator" / "watch.html",
+    "phone": PROJECT_DIR / "phone_voice" / "index.html",
+}
+
+
+def serve_page(page_key):
+    page_path = PAGES[page_key]
+    if not page_path.exists():
+        return jsonify({"error": f"{page_key} page not found"}), 404
+    return send_file(page_path)
 
 
 @app.before_request
@@ -32,12 +52,18 @@ def home():
         {
             "app": "SAMPARK Backend",
             "status": "running",
+            "pages": {
+                "dashboard": "/dashboard",
+                "watch_simulator": "/watch",
+                "phone_voice": "/phone",
+            },
             "endpoints": {
                 "create_health_record": "POST /health-data",
                 "list_health_records": "GET /health-data",
                 "latest_health_record": "GET /health-data/latest",
                 "list_alerts": "GET /alerts",
                 "latest_alert": "GET /alerts/latest",
+                "acknowledge_alert": "POST /alerts/<id>/acknowledge",
                 "emergency_alert": "POST /emergency",
                 "email_status": "GET /email-status",
                 "assistant_message": "POST /assistant-message",
@@ -45,6 +71,21 @@ def home():
             },
         }
     )
+
+
+@app.get("/dashboard")
+def dashboard_page():
+    return serve_page("dashboard")
+
+
+@app.get("/watch")
+def watch_page():
+    return serve_page("watch")
+
+
+@app.get("/phone")
+def phone_page():
+    return serve_page("phone")
 
 
 @app.post("/health-data")
@@ -88,6 +129,14 @@ def latest_alert():
     return jsonify(alert)
 
 
+@app.post("/alerts/<int:alert_id>/acknowledge")
+def acknowledge(alert_id):
+    alert = acknowledge_alert(alert_id)
+    if alert is None:
+        return jsonify({"error": "Alert not found"}), 404
+    return jsonify({"alert": alert})
+
+
 @app.get("/email-status")
 def email_status():
     return jsonify(gmail_status())
@@ -104,6 +153,7 @@ def emergency():
         "High",
         "Emergency",
         f"Emergency from {source}: {message}",
+        bypass_cooldown=True,
     )
 
     email_result = send_caretaker_email(

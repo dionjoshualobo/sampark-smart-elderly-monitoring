@@ -608,6 +608,84 @@
       background: #ffffff;
     }
 
+    .schedule-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .schedule-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .schedule-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(16, 36, 62, 0.08);
+    }
+
+    .schedule-info {
+      flex: 1;
+    }
+
+    .schedule-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .schedule-name {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .schedule-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .schedule-details {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .schedule-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .schedule-actions button {
+      min-height: 32px;
+      min-width: 32px;
+      padding: 0 10px;
+      font-size: 13px;
+    }
+
+    .delete-button {
+      background: var(--high);
+      border-color: var(--high);
+    }
+
+    .delete-button:hover {
+      background: #a82d3d;
+    }
+
     @media (max-width: 980px) {
       .layout {
         grid-template-columns: 1fr;
@@ -628,6 +706,216 @@
       .history-summary {
         grid-template-columns: 1fr;
       }
+    }
+
+    /* Assistant Widget Styles */
+    .assistant-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 380px;
+      max-height: 600px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 24px 48px rgba(16, 36, 62, 0.18);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      animation: fadeIn 240ms ease both;
+    }
+
+    .assistant-widget.minimized {
+      max-height: 64px;
+    }
+
+    .assistant-header {
+      padding: 16px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .assistant-title {
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .assistant-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-button {
+      width: 32px;
+      height: 32px;
+      min-height: 32px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .icon-button:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: none;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 400px;
+      background: #f8fafc;
+    }
+
+    .message {
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 85%;
+      line-height: 1.4;
+      font-size: 14px;
+      animation: fadeIn 200ms ease both;
+    }
+
+    .message.user {
+      background: var(--primary);
+      color: #ffffff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.assistant {
+      background: #ffffff;
+      color: var(--text);
+      align-self: flex-start;
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.system {
+      background: var(--accent-soft);
+      color: var(--accent);
+      align-self: center;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .message-time {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .chat-input-area {
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      background: #ffffff;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .voice-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .voice-button {
+      flex: 1;
+      min-height: 44px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .voice-button.listening {
+      background: var(--accent);
+      border-color: var(--accent);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .voice-button.emergency {
+      background: var(--high);
+      border-color: var(--high);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input {
+      flex: 1;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      resize: none;
+    }
+
+    .send-button {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    .assistant-status {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .fab-button {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 64px;
+      height: 64px;
+      min-height: 64px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      border: 0;
+      box-shadow: 0 12px 28px rgba(29, 95, 215, 0.3);
+      font-size: 28px;
+      display: grid;
+      place-items: center;
+      z-index: 999;
+      cursor: pointer;
+    }
+
+    .fab-button:hover {
+      transform: scale(1.05);
     }
 
     @media (max-width: 680px) {
@@ -669,6 +957,18 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .assistant-widget {
+        width: calc(100vw - 32px);
+        right: 16px;
+        bottom: 16px;
+        max-height: calc(100vh - 120px);
+      }
+
+      .fab-button {
+        right: 16px;
+        bottom: 16px;
+      }
     }
   </style>
 </head>
@@ -693,6 +993,7 @@
     <nav class="nav-tabs">
       <button type="button" class="tab-button active" id="overviewTab" onclick="showPage('overview')">Overview</button>
       <button type="button" class="tab-button" id="profileTab" onclick="showPage('profile')">Patient Profile</button>
+      <button type="button" class="tab-button" id="schedulesTab" onclick="showPage('schedules')">Schedules</button>
       <button type="button" class="tab-button" id="medsTab" onclick="showPage('meds')">Meds History</button>
       <button type="button" class="tab-button" id="mealsTab" onclick="showPage('meals')">Meals History</button>
       <button type="button" class="tab-button" id="recordsTab" onclick="showPage('records')">Saved Records</button>
@@ -718,6 +1019,11 @@
         <div>
           <section class="panel risk-panel" id="riskPanel"></section>
           <section class="metric-grid" id="metrics"></section>
+          
+          <section class="panel" style="margin-top: 18px;">
+            <h2>Today's Schedule</h2>
+            <div id="todaySchedule"></div>
+          </section>
         </div>
 
         <aside class="panel">
@@ -823,10 +1129,128 @@
         <div id="mealsHistory"></div>
       </section>
     </section>
+
+    <section class="page" id="schedulesPage">
+      <section class="panel">
+        <h2>Medication Schedule</h2>
+        <p style="color: var(--muted); margin-bottom: 14px;">Manage daily medication reminders and track compliance</p>
+        <div class="form-actions" style="margin-bottom: 18px;">
+          <button type="button" onclick="showAddMedicationForm()">+ Add Medication</button>
+        </div>
+        
+        <div class="edit-panel" id="addMedicationPanel">
+          <h3 style="margin: 0 0 14px; font-size: 16px;">Add New Medication</h3>
+          <form id="medicationForm" onsubmit="saveMedication(event)">
+            <div class="form-grid">
+              <div class="field">
+                <label for="medName">Medication Name</label>
+                <input id="medName" name="name" type="text" required placeholder="e.g., Aspirin">
+              </div>
+              <div class="field">
+                <label for="medDosage">Dosage</label>
+                <input id="medDosage" name="dosage" type="text" required placeholder="e.g., 100mg">
+              </div>
+              <div class="field">
+                <label for="medTime">Time</label>
+                <input id="medTime" name="time" type="time" required>
+              </div>
+            </div>
+            <div class="field" style="margin-top: 12px;">
+              <label for="medNotes">Notes (Optional)</label>
+              <textarea id="medNotes" name="notes" placeholder="e.g., Take with food"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit">Save Medication</button>
+              <button type="button" class="secondary" onclick="hideAddMedicationForm()">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="medicationList"></div>
+      </section>
+
+      <section class="panel" style="margin-top: 18px;">
+        <h2>Meal Schedule</h2>
+        <p style="color: var(--muted); margin-bottom: 14px;">Set meal times and track eating patterns</p>
+        <div class="form-actions" style="margin-bottom: 18px;">
+          <button type="button" onclick="showAddMealForm()">+ Add Meal</button>
+        </div>
+        
+        <div class="edit-panel" id="addMealPanel">
+          <h3 style="margin: 0 0 14px; font-size: 16px;">Add New Meal</h3>
+          <form id="mealForm" onsubmit="saveMeal(event)">
+            <div class="form-grid">
+              <div class="field">
+                <label for="mealName">Meal Name</label>
+                <input id="mealName" name="name" type="text" required placeholder="e.g., Breakfast">
+              </div>
+              <div class="field">
+                <label for="mealTime">Time</label>
+                <input id="mealTime" name="time" type="time" required>
+              </div>
+              <div class="field">
+                <label for="mealType">Type</label>
+                <select id="mealType" name="type" required>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Snack">Snack</option>
+                </select>
+              </div>
+            </div>
+            <div class="field" style="margin-top: 12px;">
+              <label for="mealNotes">Notes (Optional)</label>
+              <textarea id="mealNotes" name="notes" placeholder="e.g., Light meal, avoid spicy food"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit">Save Meal</button>
+              <button type="button" class="secondary" onclick="hideAddMealForm()">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="mealList"></div>
+      </section>
+    </section>
   </main>
 
+  <!-- Assistant Widget -->
+  <div class="assistant-widget minimized" id="assistantWidget">
+    <div class="assistant-header" onclick="toggleAssistant()">
+      <div class="assistant-title">
+        <span>💬</span>
+        <span>Health Assistant</span>
+      </div>
+      <div class="assistant-controls">
+        <button type="button" class="icon-button" onclick="event.stopPropagation(); closeAssistant()" title="Close">×</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <div class="voice-controls">
+        <button type="button" class="voice-button" id="voiceButton" onclick="toggleVoice()">
+          <span id="voiceIcon">🎤</span>
+          <span id="voiceText">Start Voice</span>
+        </button>
+        <button type="button" class="voice-button emergency" onclick="sendEmergency()">
+          <span>🚨</span>
+          <span>Emergency</span>
+        </button>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1" onkeypress="handleChatKeyPress(event)"></textarea>
+        <button type="button" class="send-button" onclick="sendChatMessage()">➤</button>
+      </div>
+    </div>
+    <div class="assistant-status" id="assistantStatus">Ready to assist</div>
+  </div>
+
+  <button type="button" class="fab-button" id="fabButton" onclick="openAssistant()" title="Open Assistant">💬</button>
+
   <script>
-    const backendUrl = "http://127.0.0.1:5000";
+    const backendUrl = (location.protocol === "http:" || location.protocol === "https:")
+      ? window.location.origin
+      : "http://127.0.0.1:5000";
     const defaultPatientProfile = {
       name: "Elderly User",
       age: 72,
@@ -913,6 +1337,8 @@
       `;
     }
 
+    let lastSeenAlertId = 0;
+
     function renderAlerts(alerts) {
       if (!alerts.length) {
         document.getElementById("alerts").innerHTML = "<div class=\"empty\">No caregiver alerts found.</div>";
@@ -920,19 +1346,78 @@
       }
 
       const items = alerts.slice(0, 8).map((alert) => `
-        <div class="alert-item ${alert.severity}">
+        <div class="alert-item ${alert.severity}" style="${alert.acknowledged ? "opacity: 0.55;" : ""}">
           <div class="alert-title">
-            <span>${alert.alert_type}</span>
+            <span>${alert.alert_type}${alert.acknowledged ? " ✓" : ""}</span>
             <span>${alert.severity}</span>
           </div>
           <div>${alert.message}</div>
           <div class="alert-meta">
             Record #${alert.health_record_id || "-"} | ${alert.created_at} | Email: ${alert.notification_status || "not_sent"}
           </div>
+          ${alert.acknowledged
+            ? ""
+            : `<button type="button" class="secondary" style="margin-top: 8px; padding: 6px 12px; font-size: 13px;" onclick="acknowledgeAlert(${alert.id})">Acknowledge</button>`}
         </div>
       `).join("");
 
       document.getElementById("alerts").innerHTML = `<div class="alert-list">${items}</div>`;
+
+      const newestId = alerts[0].id;
+      if (lastSeenAlertId > 0 && newestId > lastSeenAlertId) {
+        const fresh = alerts.filter((alert) => alert.id > lastSeenAlertId);
+        const urgent = fresh.find((alert) => alert.severity === "High");
+        if (urgent) {
+          showAlertToast(`🚨 ${urgent.alert_type}: ${urgent.message}`);
+          playAlertSound();
+        }
+      }
+      lastSeenAlertId = Math.max(lastSeenAlertId, newestId);
+    }
+
+    async function acknowledgeAlert(alertId) {
+      try {
+        await fetch(`${backendUrl}/alerts/${alertId}/acknowledge`, { method: "POST" });
+        loadDashboard();
+      } catch (error) {
+        setConnection(false, "Could not acknowledge alert");
+      }
+    }
+
+    function showAlertToast(text) {
+      let toast = document.getElementById("alertToast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "alertToast";
+        toast.style.cssText = "position: fixed; top: 20px; right: 20px; z-index: 2000; max-width: 340px;"
+          + " background: var(--high); color: #fff; padding: 14px 18px; border-radius: 10px;"
+          + " font-weight: 700; font-size: 14px; box-shadow: 0 12px 30px rgba(199,54,74,0.4);"
+          + " animation: fadeIn 240ms ease both;";
+        document.body.appendChild(toast);
+      }
+      toast.textContent = text;
+      toast.style.display = "block";
+      clearTimeout(toast.hideTimer);
+      toast.hideTimer = setTimeout(() => { toast.style.display = "none"; }, 6000);
+    }
+
+    function playAlertSound() {
+      try {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.28].forEach((offset) => {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.value = 880;
+          gain.gain.setValueAtTime(0.18, context.currentTime + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + offset + 0.22);
+          oscillator.connect(gain).connect(context.destination);
+          oscillator.start(context.currentTime + offset);
+          oscillator.stop(context.currentTime + offset + 0.24);
+        });
+      } catch (error) {
+        // Audio is optional; visual toast already shown
+      }
     }
 
     function renderRecords(records) {
@@ -1144,14 +1629,21 @@
     function showPage(pageName) {
       document.getElementById("overviewPage").classList.toggle("active", pageName === "overview");
       document.getElementById("profilePage").classList.toggle("active", pageName === "profile");
+      document.getElementById("schedulesPage").classList.toggle("active", pageName === "schedules");
       document.getElementById("medsPage").classList.toggle("active", pageName === "meds");
       document.getElementById("mealsPage").classList.toggle("active", pageName === "meals");
       document.getElementById("recordsPage").classList.toggle("active", pageName === "records");
       document.getElementById("overviewTab").classList.toggle("active", pageName === "overview");
       document.getElementById("profileTab").classList.toggle("active", pageName === "profile");
+      document.getElementById("schedulesTab").classList.toggle("active", pageName === "schedules");
       document.getElementById("medsTab").classList.toggle("active", pageName === "meds");
       document.getElementById("mealsTab").classList.toggle("active", pageName === "meals");
       document.getElementById("recordsTab").classList.toggle("active", pageName === "records");
+      
+      if (pageName === "schedules") {
+        renderMedicationSchedule();
+        renderMealSchedule();
+      }
     }
 
     async function loadDashboard() {
@@ -1175,6 +1667,7 @@
         renderHistory(recordsData.records || [], "meds");
         renderHistory(recordsData.records || [], "meals");
         renderAlerts(alertsData.alerts || []);
+        renderTodaySchedule();
         setConnection(true, `Connected to ${backendUrl}`);
       } catch (error) {
         setConnection(false, error.message);
@@ -1188,7 +1681,69 @@
         document.getElementById("medsHistory").innerHTML = "";
         document.getElementById("mealsHistory").innerHTML = "";
         document.getElementById("alerts").innerHTML = "";
+        renderTodaySchedule();
       }
+    }
+
+    function renderTodaySchedule() {
+      const container = document.getElementById("todaySchedule");
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      const upcomingMeds = medications.filter(med => med.time >= currentTime).slice(0, 3);
+      const upcomingMeals = meals.filter(meal => meal.time >= currentTime).slice(0, 3);
+      
+      if (medications.length === 0 && meals.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            No schedules set. Go to <a href="#" onclick="showPage('schedules'); return false;" style="color: var(--primary); font-weight: 700;">Schedules</a> to add medications and meals.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '<div style="display: grid; gap: 14px;">';
+      
+      if (upcomingMeds.length > 0) {
+        html += '<div><h3 style="margin: 0 0 10px; font-size: 15px; color: var(--muted);">Upcoming Medications</h3>';
+        html += '<div style="display: grid; gap: 8px;">';
+        upcomingMeds.forEach(med => {
+          html += `
+            <div style="padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 700; color: var(--text);">${med.name} - ${med.dosage}</div>
+                <div style="font-size: 13px; color: var(--muted); margin-top: 2px;">${med.notes || 'No notes'}</div>
+              </div>
+              <div style="font-weight: 800; color: var(--accent); font-size: 14px;">🕐 ${formatTime(med.time)}</div>
+            </div>
+          `;
+        });
+        html += '</div></div>';
+      }
+      
+      if (upcomingMeals.length > 0) {
+        html += '<div><h3 style="margin: 0 0 10px; font-size: 15px; color: var(--muted);">Upcoming Meals</h3>';
+        html += '<div style="display: grid; gap: 8px;">';
+        upcomingMeals.forEach(meal => {
+          html += `
+            <div style="padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 700; color: var(--text);">${meal.name} (${meal.type})</div>
+                <div style="font-size: 13px; color: var(--muted); margin-top: 2px;">${meal.notes || 'No notes'}</div>
+              </div>
+              <div style="font-weight: 800; color: var(--accent); font-size: 14px;">🕐 ${formatTime(meal.time)}</div>
+            </div>
+          `;
+        });
+        html += '</div></div>';
+      }
+      
+      if (upcomingMeds.length === 0 && upcomingMeals.length === 0) {
+        html += '<div class="empty">No upcoming schedules for today. All done! ✓</div>';
+      }
+      
+      html += '</div>';
+      container.innerHTML = html;
     }
 
     function scheduleRefresh() {
@@ -1211,6 +1766,454 @@
     renderProfile();
     loadDashboard();
     scheduleRefresh();
+
+    // Assistant Widget State
+    const sessionId = localStorage.getItem("samparkAssistantSession") || crypto.randomUUID();
+    localStorage.setItem("samparkAssistantSession", sessionId);
+    let recognizer = null;
+    let isListening = false;
+    let chatHistory = [];
+
+    function addMessage(text, type) {
+      const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      chatHistory.push({ text, type, time });
+      renderChatMessages();
+      
+      const messagesContainer = document.getElementById("chatMessages");
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 100);
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById("chatMessages");
+      if (chatHistory.length === 0) {
+        container.innerHTML = '<div class="message system">Hello! I\'m your health assistant. You can type or use voice to talk to me.</div>';
+        return;
+      }
+      
+      container.innerHTML = chatHistory.map(msg => `
+        <div class="message ${msg.type}">
+          <div>${msg.text}</div>
+          <div class="message-time">${msg.time}</div>
+        </div>
+      `).join('');
+    }
+
+    function setAssistantStatus(text) {
+      document.getElementById("assistantStatus").textContent = text;
+    }
+
+    function toggleAssistant() {
+      const widget = document.getElementById("assistantWidget");
+      widget.classList.toggle("minimized");
+      if (!widget.classList.contains("minimized")) {
+        renderChatMessages();
+      }
+    }
+
+    function openAssistant() {
+      document.getElementById("assistantWidget").classList.remove("minimized");
+      document.getElementById("fabButton").style.display = "none";
+      renderChatMessages();
+    }
+
+    function closeAssistant() {
+      document.getElementById("assistantWidget").style.display = "none";
+      document.getElementById("fabButton").style.display = "grid";
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById("chatInput");
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      input.value = "";
+      addMessage(message, "user");
+      setAssistantStatus("Processing...");
+      
+      try {
+        const response = await fetch(`${backendUrl}/assistant-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message,
+            session_id: sessionId,
+            source: "dashboard_chat"
+          })
+        });
+        
+        const result = await response.json();
+        addMessage(result.reply || "I heard you.", "assistant");
+        setAssistantStatus("Ready to assist");
+        
+        if (result.backend_response) {
+          loadDashboard();
+        }
+        
+        if (result.emergency) {
+          addMessage("🚨 Emergency alert sent to caregiver", "system");
+        }
+      } catch (error) {
+        addMessage("Could not connect to backend. Please check the connection.", "assistant");
+        setAssistantStatus("Connection error");
+      }
+    }
+
+    function handleChatKeyPress(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    }
+
+    function toggleVoice() {
+      if (isListening) {
+        stopVoice();
+      } else {
+        startVoice();
+      }
+    }
+
+    function startVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        addMessage("Speech recognition is not supported in this browser. Please use Chrome.", "system");
+        return;
+      }
+      
+      recognizer = new SpeechRecognition();
+      recognizer.lang = "en-IN";
+      recognizer.interimResults = false;
+      recognizer.continuous = false;
+      
+      recognizer.onstart = () => {
+        isListening = true;
+        document.getElementById("voiceButton").classList.add("listening");
+        document.getElementById("voiceIcon").textContent = "🔴";
+        document.getElementById("voiceText").textContent = "Listening...";
+        setAssistantStatus("Listening...");
+      };
+      
+      recognizer.onspeechstart = () => {
+        setAssistantStatus("Voice detected, keep speaking...");
+      };
+      
+      recognizer.onresult = (event) => {
+        const message = event.results[0][0].transcript;
+        addMessage(message, "user");
+        processVoiceMessage(message);
+      };
+      
+      recognizer.onerror = (event) => {
+        stopVoice();
+        if (event.error === "no-speech") {
+          addMessage("No speech detected. Please try again.", "system");
+        } else if (event.error === "not-allowed") {
+          addMessage("Microphone permission denied. Please allow microphone access.", "system");
+        } else {
+          addMessage(`Voice error: ${event.error}. Please try again.`, "system");
+        }
+      };
+      
+      recognizer.onend = () => {
+        stopVoice();
+      };
+      
+      recognizer.start();
+    }
+
+    function stopVoice() {
+      isListening = false;
+      if (recognizer) {
+        recognizer.stop();
+      }
+      document.getElementById("voiceButton").classList.remove("listening");
+      document.getElementById("voiceIcon").textContent = "🎤";
+      document.getElementById("voiceText").textContent = "Start Voice";
+      setAssistantStatus("Ready to assist");
+    }
+
+    async function processVoiceMessage(message) {
+      setAssistantStatus("Processing voice message...");
+      
+      try {
+        // Add schedule context to the message
+        const scheduleContext = getScheduleContext();
+        const contextualMessage = scheduleContext ? `${message}\n\nSchedule Context: ${scheduleContext}` : message;
+        
+        const response = await fetch(`${backendUrl}/assistant-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: contextualMessage,
+            session_id: sessionId,
+            source: "dashboard_voice"
+          })
+        });
+        
+        const result = await response.json();
+        const reply = result.reply || "I heard you.";
+        addMessage(reply, "assistant");
+        speakText(reply);
+        setAssistantStatus("Ready to assist");
+        
+        if (result.backend_response) {
+          loadDashboard();
+        }
+        
+        if (result.emergency) {
+          addMessage("🚨 Emergency alert sent to caregiver", "system");
+        }
+      } catch (error) {
+        const errorMsg = "Could not connect to backend. Please check the connection.";
+        addMessage(errorMsg, "assistant");
+        speakText(errorMsg);
+        setAssistantStatus("Connection error");
+      }
+    }
+
+    function getScheduleContext() {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      const recentMeds = medications.filter(med => {
+        const medTime = med.time;
+        const timeDiff = getTimeDifferenceMinutes(medTime, currentTime);
+        return timeDiff >= -60 && timeDiff <= 60; // Within 1 hour window
+      });
+      
+      const recentMeals = meals.filter(meal => {
+        const mealTime = meal.time;
+        const timeDiff = getTimeDifferenceMinutes(mealTime, currentTime);
+        return timeDiff >= -120 && timeDiff <= 120; // Within 2 hour window
+      });
+      
+      let context = [];
+      if (recentMeds.length > 0) {
+        context.push(`Scheduled medications: ${recentMeds.map(m => `${m.name} at ${formatTime(m.time)}`).join(', ')}`);
+      }
+      if (recentMeals.length > 0) {
+        context.push(`Scheduled meals: ${recentMeals.map(m => `${m.name} at ${formatTime(m.time)}`).join(', ')}`);
+      }
+      
+      return context.length > 0 ? context.join('. ') : null;
+    }
+
+    function getTimeDifferenceMinutes(time1, time2) {
+      const [h1, m1] = time1.split(':').map(Number);
+      const [h2, m2] = time2.split(':').map(Number);
+      return (h1 * 60 + m1) - (h2 * 60 + m2);
+    }
+
+    function speakText(text) {
+      if ("speechSynthesis" in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.lang = "en-IN";
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    async function sendEmergency() {
+      stopVoice();
+      addMessage("🚨 Emergency button pressed", "user");
+      setAssistantStatus("Sending emergency alert...");
+      
+      try {
+        const response = await fetch(`${backendUrl}/assistant-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: "Emergency button pressed - need immediate help",
+            session_id: sessionId,
+            source: "dashboard_emergency"
+          })
+        });
+        
+        const result = await response.json();
+        addMessage(result.reply || "Emergency alert sent to caregiver.", "assistant");
+        speakText(result.reply || "Emergency alert sent to caregiver.");
+        addMessage("🚨 Emergency alert sent successfully", "system");
+        setAssistantStatus("Emergency alert sent");
+        
+        if (result.backend_response) {
+          loadDashboard();
+        }
+      } catch (error) {
+        const errorMsg = "Emergency detected but backend is not reachable. Please call your caretaker directly.";
+        addMessage(errorMsg, "assistant");
+        speakText(errorMsg);
+        setAssistantStatus("Connection error");
+      }
+    }
+
+    // Initialize assistant widget
+    renderChatMessages();
+
+    // Medication and Meal Schedule Management
+    let medications = JSON.parse(localStorage.getItem("samparkMedications") || "[]");
+    let meals = JSON.parse(localStorage.getItem("samparkMeals") || "[]");
+
+    function showAddMedicationForm() {
+      document.getElementById("addMedicationPanel").classList.add("active");
+      document.getElementById("medicationForm").reset();
+    }
+
+    function hideAddMedicationForm() {
+      document.getElementById("addMedicationPanel").classList.remove("active");
+    }
+
+    function saveMedication(event) {
+      event.preventDefault();
+      const form = event.target;
+      const medication = {
+        id: Date.now(),
+        name: form.elements.name.value.trim(),
+        dosage: form.elements.dosage.value.trim(),
+        time: form.elements.time.value,
+        notes: form.elements.notes.value.trim()
+      };
+      
+      medications.push(medication);
+      medications.sort((a, b) => a.time.localeCompare(b.time));
+      localStorage.setItem("samparkMedications", JSON.stringify(medications));
+      
+      hideAddMedicationForm();
+      renderMedicationSchedule();
+    }
+
+    function deleteMedication(id) {
+      if (!confirm("Are you sure you want to delete this medication?")) return;
+      
+      medications = medications.filter(med => med.id !== id);
+      localStorage.setItem("samparkMedications", JSON.stringify(medications));
+      renderMedicationSchedule();
+    }
+
+    function renderMedicationSchedule() {
+      const container = document.getElementById("medicationList");
+      
+      if (medications.length === 0) {
+        container.innerHTML = '<div class="empty">No medications scheduled. Click "Add Medication" to create your first entry.</div>';
+        return;
+      }
+
+      const items = medications.map(med => `
+        <div class="schedule-item">
+          <div class="schedule-info">
+            <div class="schedule-header">
+              <span class="schedule-name">${med.name}</span>
+              <span class="schedule-time">🕐 ${formatTime(med.time)}</span>
+            </div>
+            <div class="schedule-details">
+              <strong>Dosage:</strong> ${med.dosage}
+              ${med.notes ? `<br><strong>Notes:</strong> ${med.notes}` : ''}
+            </div>
+          </div>
+          <div class="schedule-actions">
+            <button type="button" class="secondary delete-button" onclick="deleteMedication(${med.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `<div class="schedule-list">${items}</div>`;
+    }
+
+    function showAddMealForm() {
+      document.getElementById("addMealPanel").classList.add("active");
+      document.getElementById("mealForm").reset();
+    }
+
+    function hideAddMealForm() {
+      document.getElementById("addMealPanel").classList.remove("active");
+    }
+
+    function saveMeal(event) {
+      event.preventDefault();
+      const form = event.target;
+      const meal = {
+        id: Date.now(),
+        name: form.elements.name.value.trim(),
+        time: form.elements.time.value,
+        type: form.elements.type.value,
+        notes: form.elements.notes.value.trim()
+      };
+      
+      meals.push(meal);
+      meals.sort((a, b) => a.time.localeCompare(b.time));
+      localStorage.setItem("samparkMeals", JSON.stringify(meals));
+      
+      hideAddMealForm();
+      renderMealSchedule();
+    }
+
+    function deleteMeal(id) {
+      if (!confirm("Are you sure you want to delete this meal?")) return;
+      
+      meals = meals.filter(meal => meal.id !== id);
+      localStorage.setItem("samparkMeals", JSON.stringify(meals));
+      renderMealSchedule();
+    }
+
+    function renderMealSchedule() {
+      const container = document.getElementById("mealList");
+      
+      if (meals.length === 0) {
+        container.innerHTML = '<div class="empty">No meals scheduled. Click "Add Meal" to create your first entry.</div>';
+        return;
+      }
+
+      const items = meals.map(meal => `
+        <div class="schedule-item">
+          <div class="schedule-info">
+            <div class="schedule-header">
+              <span class="schedule-name">${meal.name}</span>
+              <span class="schedule-time">🕐 ${formatTime(meal.time)}</span>
+            </div>
+            <div class="schedule-details">
+              <strong>Type:</strong> ${meal.type}
+              ${meal.notes ? `<br><strong>Notes:</strong> ${meal.notes}` : ''}
+            </div>
+          </div>
+          <div class="schedule-actions">
+            <button type="button" class="secondary delete-button" onclick="deleteMeal(${meal.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `<div class="schedule-list">${items}</div>`;
+    }
+
+    function formatTime(time24) {
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    }
+
+    function getScheduleSummary() {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      const upcomingMeds = medications.filter(med => med.time > currentTime).slice(0, 2);
+      const upcomingMeals = meals.filter(meal => meal.time > currentTime).slice(0, 2);
+      
+      return {
+        totalMeds: medications.length,
+        totalMeals: meals.length,
+        upcomingMeds,
+        upcomingMeals
+      };
+    }
+
+    // Initialize schedules
+    renderMedicationSchedule();
+    renderMealSchedule();
   </script>
 </body>
 </html>

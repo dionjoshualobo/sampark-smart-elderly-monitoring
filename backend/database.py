@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -7,6 +8,7 @@ from risk_engine import normalize_health_data, predict_risk
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "sampark.db"
+ALERT_COOLDOWN_SECONDS = int(os.getenv("SAMPARK_ALERT_COOLDOWN", "60"))
 
 
 def get_connection():
@@ -151,14 +153,16 @@ def create_health_record(payload):
         )
 
     record = get_health_record(cursor.lastrowid)
-    create_alerts_for_record(record)
+    record["new_alerts"] = create_alerts_for_record(record)
     return record
 
 
-def create_alert(record_id, severity, alert_type, message):
+def create_alert(record_id, severity, alert_type, message, bypass_cooldown=False):
     created_at = datetime.now().isoformat(timespec="seconds")
 
     with get_connection() as connection:
+        if not bypass_cooldown and is_alert_in_cooldown(connection, alert_type):
+            return None
         cursor = connection.execute(
             """
             INSERT INTO alerts (
@@ -174,6 +178,44 @@ def create_alert(record_id, severity, alert_type, message):
         )
 
     return get_alert(cursor.lastrowid)
+
+
+def is_alert_in_cooldown(connection, alert_type):
+    row = connection.execute(
+        """
+        SELECT created_at
+        FROM alerts
+        WHERE alert_type = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (alert_type,),
+    ).fetchone()
+
+    if row is None:
+        return False
+
+    try:
+        last_time = datetime.fromisoformat(row["created_at"])
+    except ValueError:
+        return False
+
+    elapsed = (datetime.now() - last_time).total_seconds()
+    return elapsed < ALERT_COOLDOWN_SECONDS
+
+
+def acknowledge_alert(alert_id):
+    with get_connection() as connection:
+        connection.execute(
+            """
+            UPDATE alerts
+            SET acknowledged = 1
+            WHERE id = ?
+            """,
+            (alert_id,),
+        )
+
+    return get_alert(alert_id)
 
 
 def update_alert_notification(alert_id, status):
@@ -192,6 +234,9 @@ def update_alert_notification(alert_id, status):
 
 def send_high_risk_email(record, alert):
     from email_notifier import send_caretaker_email
+
+    if alert is None:
+        return None
 
     reasons = ", ".join(record["reasons"]) if record["reasons"] else "High risk prediction"
     medicine_detail = record.get("missed_meds_detail") or "Not specified"
@@ -219,6 +264,8 @@ def send_high_risk_email(record, alert):
 
 
 def create_alerts_for_record(record):
+    new_alerts = []
+
     if record["risk"] == "High":
         alert = create_alert(
             record["id"],
@@ -226,39 +273,51 @@ def create_alerts_for_record(record):
             "High Risk",
             "High health risk detected. Caregiver attention is recommended.",
         )
-        send_high_risk_email(record, alert)
+        updated_alert = send_high_risk_email(record, alert)
+        if updated_alert:
+            new_alerts.append(updated_alert)
 
     if record["falls"] > 0:
-        create_alert(
+        alert = create_alert(
             record["id"],
             "High",
             "Fall",
             "Fall reported. Check the elderly person immediately.",
         )
+        if alert:
+            new_alerts.append(alert)
 
     if record["spo2"] < 94:
-        create_alert(
+        alert = create_alert(
             record["id"],
             "High",
             "Low SpO2",
             "Low oxygen level detected.",
         )
+        if alert:
+            new_alerts.append(alert)
 
     if record["heart_rate"] < 55 or record["heart_rate"] > 110:
-        create_alert(
+        alert = create_alert(
             record["id"],
             "Medium",
             "Abnormal Heart Rate",
             "Heart rate is outside the normal monitoring range.",
         )
+        if alert:
+            new_alerts.append(alert)
 
     if record["missed_meds"] > 0:
-        create_alert(
+        alert = create_alert(
             record["id"],
             "Medium",
             "Missed Medicine",
             "Medicine was missed. Reminder or caregiver follow-up is needed.",
         )
+        if alert:
+            new_alerts.append(alert)
+
+    return new_alerts
 
 
 def list_health_records(limit=50):

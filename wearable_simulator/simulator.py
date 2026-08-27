@@ -1,4 +1,5 @@
 import argparse
+import os
 import random
 import time
 from datetime import date
@@ -6,7 +7,7 @@ from datetime import date
 import requests
 
 
-BACKEND_URL = "http://127.0.0.1:5000"
+BACKEND_URL = os.getenv("SAMPARK_BACKEND_URL", "http://127.0.0.1:5000")
 
 
 class WatchState:
@@ -52,6 +53,7 @@ def warning_watch_data(steps=None):
         "heart_rate": random.choice([random.randint(45, 54), random.randint(111, 125)]),
         "spo2": random.randint(90, 94),
         "steps": steps if steps is not None else random.randint(200, 1200),
+        "falls": random.choices([0, 1], weights=[88, 12])[0],
     }
 
 

@@ -1,241 +1,225 @@
 #!/usr/bin/env python3
 """
 SAMPARK Unified Launcher
-Starts all backend services together for easy system operation.
+Starts the whole system with one command:
+
+    python run_sampark.py
+
+This starts:
+  1. Flask backend API        -> http://127.0.0.1:5000
+  2. Care Dashboard           -> http://127.0.0.1:5000/dashboard
+  3. Watch Simulator page     -> http://127.0.0.1:5000/watch
+  4. Phone Voice page         -> http://127.0.0.1:5000/phone
+  5. Background watch data feed (unless --no-watch)
+
+Press Ctrl+C to stop everything.
 """
 
+import argparse
 import os
-import sys
-import time
-import signal
+import socket
 import subprocess
+import sys
+import threading
+import time
+import urllib.request
+import webbrowser
 from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
 
-# Color codes for terminal output
-class Colors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
+REQUIRED_MODULES = [
+    ("flask", "Flask"),
+    ("flask_cors", "flask-cors"),
+    ("sklearn", "scikit-learn"),
+    ("requests", "requests"),
+]
 
 
-def print_header(text):
-    print(f"\n{Colors.HEADER}{Colors.BOLD}{'='*60}{Colors.ENDC}")
-    print(f"{Colors.HEADER}{Colors.BOLD}{text.center(60)}{Colors.ENDC}")
-    print(f"{Colors.HEADER}{Colors.BOLD}{'='*60}{Colors.ENDC}\n")
-
-
-def print_info(text):
-    print(f"{Colors.OKBLUE}ℹ {text}{Colors.ENDC}")
-
-
-def print_success(text):
-    print(f"{Colors.OKGREEN}✓ {text}{Colors.ENDC}")
-
-
-def print_warning(text):
-    print(f"{Colors.WARNING}⚠ {text}{Colors.ENDC}")
-
-
-def print_error(text):
-    print(f"{Colors.FAIL}✗ {text}{Colors.ENDC}")
-
-
-class ServiceManager:
-    def __init__(self):
-        self.processes = []
-        self.base_dir = Path(__file__).parent.absolute()
-        
-    def start_backend(self):
-        """Start Flask backend API"""
-        print_info("Starting Flask Backend API...")
-        backend_dir = self.base_dir / "backend"
-        
-        process = subprocess.Popen(
-            [sys.executable, "app.py"],
-            cwd=backend_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        self.processes.append(("Backend API", process))
-        print_success("Backend API started on http://127.0.0.1:5000")
-        return process
-    
-    def start_dashboard(self):
-        """Start Streamlit dashboard"""
-        print_info("Starting Streamlit Dashboard...")
-        dashboard_dir = self.base_dir / "dashboard"
-        
-        process = subprocess.Popen(
-            [sys.executable, "-m", "streamlit", "run", "app.py", "--server.headless", "true"],
-            cwd=dashboard_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        self.processes.append(("Dashboard", process))
-        print_success("Dashboard started on http://localhost:8501")
-        return process
-    
-    def start_wearable_simulator(self, mode="random", interval=10):
-        """Start wearable simulator in live mode"""
-        print_info(f"Starting Wearable Simulator (mode: {mode}, interval: {interval}s)...")
-        simulator_dir = self.base_dir / "wearable_simulator"
-        
-        process = subprocess.Popen(
-            [sys.executable, "simulator.py", "--live", "--mode", mode, "--interval", str(interval)],
-            cwd=simulator_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        self.processes.append(("Wearable Simulator", process))
-        print_success(f"Wearable Simulator started (sending data every {interval}s)")
-        return process
-    
-    def monitor_processes(self):
-        """Monitor all running processes and display their output"""
-        print_header("SAMPARK System Running")
-        print_info("All services are now running. Press Ctrl+C to stop all services.\n")
-        
-        print(f"{Colors.OKCYAN}Service URLs:{Colors.ENDC}")
-        print(f"  • Backend API:  http://127.0.0.1:5000")
-        print(f"  • Dashboard:    http://localhost:8501")
-        print(f"\n{Colors.OKCYAN}Available Services:{Colors.ENDC}")
-        for name, _ in self.processes:
-            print(f"  • {name}")
-        print()
-        
-        try:
-            while True:
-                for name, process in self.processes:
-                    if process.poll() is not None:
-                        print_error(f"{name} has stopped unexpectedly!")
-                        return False
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print(f"\n{Colors.WARNING}Shutting down all services...{Colors.ENDC}")
-            return True
-    
-    def stop_all(self):
-        """Stop all running processes"""
-        for name, process in self.processes:
-            try:
-                print_info(f"Stopping {name}...")
-                process.terminate()
-                process.wait(timeout=5)
-                print_success(f"{name} stopped")
-            except subprocess.TimeoutExpired:
-                print_warning(f"Force killing {name}...")
-                process.kill()
-                process.wait()
-            except Exception as e:
-                print_error(f"Error stopping {name}: {e}")
-        
-        self.processes.clear()
-        print_success("All services stopped")
+def log(message):
+    print(f"[sampark] {message}", flush=True)
 
 
 def check_dependencies():
-    """Check if required dependencies are installed"""
-    print_info("Checking dependencies...")
-    
-    required_modules = [
-        ("flask", "Flask"),
-        ("streamlit", "Streamlit"),
-        ("sklearn", "scikit-learn"),
-        ("requests", "requests"),
-    ]
-    
     missing = []
-    for module, package in required_modules:
+    for module_name, package_name in REQUIRED_MODULES:
         try:
-            __import__(module)
+            __import__(module_name)
         except ImportError:
-            missing.append(package)
-    
-    if missing:
-        print_error("Missing required packages:")
-        for package in missing:
-            print(f"  • {package}")
-        print(f"\n{Colors.WARNING}Install all dependencies with:{Colors.ENDC}")
-        
-        # Check if venv exists
-        venv_path = Path(__file__).parent / "venv"
-        if venv_path.exists():
-            print(f"  source venv/bin/activate  # Activate virtual environment")
-            print(f"  pip install -r requirements.txt\n")
-        else:
-            print(f"  python -m venv venv  # Create virtual environment")
-            print(f"  source venv/bin/activate  # Activate it")
-            print(f"  pip install -r requirements.txt\n")
-        return False
-    
-    print_success("All dependencies are installed")
-    return True
+            missing.append(package_name)
+    return missing
+
+
+def install_dependencies(packages):
+    log(f"Installing missing packages: {', '.join(packages)}")
+    try:
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", *packages],
+            cwd=BASE_DIR,
+        )
+    except subprocess.CalledProcessError:
+        log("Automatic install failed. Install manually with:")
+        log(f"    pip install -r {BASE_DIR / 'requirements.txt'}")
+        sys.exit(1)
+
+
+def port_is_open(host, port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(1)
+        return sock.connect_ex((host, port)) == 0
+
+
+def wait_for_backend(url, timeout_seconds=30):
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        try:
+            with urllib.request.urlopen(url, timeout=2) as response:
+                if response.status == 200:
+                    return True
+        except Exception:
+            time.sleep(0.5)
+    return False
+
+
+def open_browser_when_ready(url):
+    if wait_for_backend(url):
+        webbrowser.open(url)
+        log(f"Dashboard opened in your browser: {url}")
+    else:
+        log("Backend did not become ready in time; open the URL manually.")
+
+
+def start_watch_feed(mode, interval):
+    """Run the wearable simulator inside this process as a daemon thread."""
+    simulator_dir = BASE_DIR / "wearable_simulator"
+    if str(simulator_dir) not in sys.path:
+        sys.path.insert(0, str(simulator_dir))
+
+    import simulator as watch_simulator
+
+    def feed_loop():
+        wait_for_backend(os.environ["SAMPARK_BACKEND_URL"], timeout_seconds=60)
+        watch_state = watch_simulator.WatchState()
+        log(f"Watch feed running (mode={mode}, every {interval}s)")
+        while True:
+            steps = watch_state.next_steps(mode)
+            data = watch_simulator.get_watch_data(mode, steps)
+            try:
+                record = watch_simulator.send_watch_data(data)
+                watch_simulator.print_result(record)
+            except Exception as error:
+                print(f"[watch] Could not send reading: {error}", flush=True)
+            time.sleep(interval)
+
+    thread = threading.Thread(target=feed_loop, daemon=True)
+    thread.start()
+
+
+def start_streamlit_dashboard(port):
+    dashboard_dir = BASE_DIR / "dashboard"
+    try:
+        process = subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "streamlit",
+                "run",
+                "app.py",
+                "--server.headless",
+                "true",
+                "--server.port",
+                "8501",
+            ],
+            cwd=dashboard_dir,
+        )
+        log("Streamlit dashboard starting on http://localhost:8501")
+        return process
+    except Exception as error:
+        log(f"Could not start Streamlit ({error}). Install extras: pip install -r requirements-full.txt")
+        return None
+
+
+def reset_database():
+    db_path = BASE_DIR / "backend" / "sampark.db"
+    if db_path.exists():
+        db_path.unlink()
+        log(f"Cleared database: {db_path}")
+    else:
+        log("Database already empty")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run the complete SAMPARK system with one command.")
+    parser.add_argument("--no-watch", action="store_true", help="Do not start the background wearable data feed")
+    parser.add_argument("--mode", choices=["normal", "warning", "random"], default="random",
+                        help="Background watch feed data mode (default: random)")
+    parser.add_argument("--interval", type=int, default=10, help="Seconds between background watch readings (default: 10)")
+    parser.add_argument("--port", type=int, default=5000, help="Backend port (default: 5000)")
+    parser.add_argument("--no-browser", action="store_true", help="Do not auto-open the dashboard in a browser")
+    parser.add_argument("--streamlit", action="store_true", help="Also start the optional Streamlit dashboard")
+    parser.add_argument("--reset-db", action="store_true", help="Delete all saved records and alerts before starting")
+    return parser.parse_args()
 
 
 def main():
-    print_header("SAMPARK - Smart Elderly Monitoring System")
-    
-    # Check dependencies
-    if not check_dependencies():
+    args = parse_args()
+
+    print()
+    print("=" * 62)
+    print("SAMPARK - Smart Elderly Monitoring System".center(62))
+    print("=" * 62)
+    print()
+
+    missing = check_dependencies()
+    if missing:
+        install_dependencies(missing)
+
+    if args.reset_db:
+        reset_database()
+
+    host = "127.0.0.1"
+    if port_is_open(host, args.port):
+        log(f"Port {args.port} is already in use (is SAMPARK already running?)")
+        log(f"Try: http://{host}:{args.port}/dashboard  or stop the other program first.")
         sys.exit(1)
-    
-    # Parse command line arguments
-    import argparse
-    parser = argparse.ArgumentParser(description="Run SAMPARK unified system")
-    parser.add_argument(
-        "--no-simulator",
-        action="store_true",
-        help="Don't start the wearable simulator"
-    )
-    parser.add_argument(
-        "--simulator-mode",
-        choices=["normal", "warning", "random"],
-        default="random",
-        help="Wearable simulator mode (default: random)"
-    )
-    parser.add_argument(
-        "--simulator-interval",
-        type=int,
-        default=10,
-        help="Seconds between simulator data points (default: 10)"
-    )
-    args = parser.parse_args()
-    
-    manager = ServiceManager()
-    
+
+    # Make sure every part of the app talks to the same backend URL
+    os.environ["SAMPARK_BACKEND_URL"] = f"http://{host}:{args.port}"
+
+    if not args.no_watch:
+        start_watch_feed(args.mode, max(args.interval, 3))
+
+    streamlit_process = None
+    if args.streamlit:
+        streamlit_process = start_streamlit_dashboard(args.port)
+
+    if not args.no_browser:
+        threading.Thread(
+            target=open_browser_when_ready,
+            args=(f"http://{host}:{args.port}/dashboard",),
+            daemon=True,
+        ).start()
+
+    sys.path.insert(0, str(BASE_DIR / "backend"))
+    from app import app  # noqa: E402
+
+    print()
+    log(f"Backend API      : http://{host}:{args.port}")
+    log(f"Care Dashboard   : http://{host}:{args.port}/dashboard")
+    log(f"Watch Simulator  : http://{host}:{args.port}/watch")
+    log(f"Phone Voice      : http://{host}:{args.port}/phone")
+    log("Press Ctrl+C to stop everything.")
+    print()
+
     try:
-        # Start all services
-        time.sleep(0.5)
-        manager.start_backend()
-        time.sleep(2)  # Give backend time to start
-        
-        manager.start_dashboard()
-        time.sleep(1)
-        
-        if not args.no_simulator:
-            manager.start_wearable_simulator(args.simulator_mode, args.simulator_interval)
-            time.sleep(1)
-        
-        # Monitor processes
-        manager.monitor_processes()
-        
-    except Exception as e:
-        print_error(f"Error starting services: {e}")
+        app.run(host="0.0.0.0", port=args.port, debug=False, use_reloader=False)
+    except KeyboardInterrupt:
+        pass
     finally:
-        manager.stop_all()
-        print_header("SAMPARK System Stopped")
+        if streamlit_process:
+            streamlit_process.terminate()
+        print()
+        log("SAMPARK stopped. Goodbye!")
 
 
 if __name__ == "__main__":

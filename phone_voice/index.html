@@ -169,7 +169,10 @@
   </main>
 
   <script>
-    const defaultBackendUrl = localStorage.getItem("samparkPhoneBackendUrl") || "http://127.0.0.1:5000";
+    const defaultBackendUrl = localStorage.getItem("samparkPhoneBackendUrl")
+      || ((location.protocol === "http:" || location.protocol === "https:")
+        ? window.location.origin
+        : "http://127.0.0.1:5000");
     const backendInput = document.getElementById("backendUrl");
     backendInput.value = defaultBackendUrl;
 

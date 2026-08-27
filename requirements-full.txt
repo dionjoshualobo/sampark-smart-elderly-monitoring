@@ -1,0 +1,20 @@
+# SAMPARK - Optional Extras
+# Only needed for the Streamlit dashboard, PC microphone voice mode,
+# or LLM-powered assistant replies.
+#
+#     pip install -r requirements-full.txt
+#
+# Note: PyAudio may need portaudio system libraries on some systems.
+
+# Streamlit dashboard (python run_sampark.py --streamlit)
+streamlit==1.37.1
+pandas==2.2.2
+
+# PC voice assistant (voice_assistant/voice_mode.py)
+SpeechRecognition==3.10.4
+pyttsx3==2.90
+PyAudio==0.2.14
+
+# LLM assistant mode (optional)
+openai==1.93.0
+google-genai==1.49.0
